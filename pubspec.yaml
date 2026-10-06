@@ -9,7 +9,9 @@ dependencies:
     sdk: flutter
   shared_preferences: ^2.2.3
   animated_bottom_navigation_bar: ^1.4.1
-  file_picker: ^8.1.2   # escolher o arquivo CSV
+  file_picker: ^13.1.0   # escolher o arquivo CSV
   csv: ^6.0.0           # ler/gerar CSV
+  path_provider: ^2.1.6
+  permission_handler: ^13.0.2
 flutter:
   uses-material-design: true

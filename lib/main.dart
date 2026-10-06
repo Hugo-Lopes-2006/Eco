@@ -14,7 +14,7 @@ import 'planilha.dart'; // importar/exportar CSV
 import 'store.dart';
 
 // Nome mostrado na saudação. Troque aqui.
-const nomeUsuario = 'Aguinaldo';
+const nomeUsuario = 'Hugo';
 
 // main() é onde o app COMEÇA. Primeiro criamos a store e carregamos os dados
 // salvos; só depois abrimos a tela (por isso o 'await').
@@ -29,7 +29,7 @@ void main() async {
     debugShowCheckedModeBanner: false,
     theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-            seedColor: Colors.lightGreenAccent, brightness: Brightness.dark),
+            seedColor: Colors.blueAccent, brightness: Brightness.dark),
         useMaterial3: true),
     home: Shell(store),
   ));
@@ -148,29 +148,38 @@ class HomePage extends StatelessWidget {
             : 'BOA NOITE';
   }
 
-  // Escolhe um .csv no aparelho, lê e importa. 'await' = espera terminar.
-  Future<void> _importar(BuildContext context) async {
-    final r = await FilePicker.platform.pickFiles(
-        type: FileType.custom, allowedExtensions: ['csv'], withData: true);
-    final bytes = r?.files.single.bytes; // null se cancelou
-    if (bytes == null) return;
-    final n = await importarCsv(s, utf8.decode(bytes, allowMalformed: true));
-    // 'mounted': só mostra o aviso se a tela ainda existe.
-    if (context.mounted) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('$n obras novas importadas')));
-    }
-  }
+// Escolhe um .csv no aparelho, lê e importa.
+Future<void> _importar(BuildContext context) async {
+  final file = await FilePicker.pickFile(
+    type: FileType.custom,
+    allowedExtensions: ['csv'],
+  );
 
-  // Copia todo o acervo em CSV para a área de transferência (cole no Excel/Planilhas).
-  Future<void> _exportar(BuildContext context) async {
-    await Clipboard.setData(ClipboardData(text: exportarCsv(s)));
-    if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('CSV copiado! Cole numa planilha.')));
-    }
-  }
+  if (file == null) return; // usuário cancelou
 
+  final bytes = await file.readAsBytes();
+
+  final n = await importarCsv(
+    s,
+    utf8.decode(bytes, allowMalformed: true),
+  );
+
+  // 'mounted': só mostra o aviso se a tela ainda existe.
+  if (context.mounted) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('$n obras novas importadas')),
+    );
+  }
+}
+// Copia todo o acervo em CSV para a área de transferência (cole no Excel/Planilhas).
+Future<void> _exportar(BuildContext context) async {
+  await Clipboard.setData(ClipboardData(text: exportarCsv(s)));
+  if (context.mounted) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('CSV copiado! Cole numa planilha.')),
+    );
+  }
+}
   @override
   Widget build(BuildContext context) {
     final hoje = s.hoje();
